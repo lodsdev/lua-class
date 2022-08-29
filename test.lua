@@ -1,25 +1,38 @@
-local Animal = Class:create({
-    constructor = function(self, name)
-        self.name = name
-    end,
+-- local Animal = Class({
+--     constructor = function(self, name)
+--         self.name = name
+--     end,
 
-    eat = function(self)
-        print("Animal: " .. self.name .. "  is eating")
-    end
-})
+--     eat = function(self)
+--         print("Animal: " .. self.name .. "  is eating")
+--     end
+-- })
 
-local Dog = Class:extends(Animal, {
-    constructor = function(self)
-        self.name = "Dog"
-    end,
+-- local Dog = Class({
+--     name = 'Dog',
 
-    eat = function(self)
-        Animal.eat()
-        print("Dog: " .. self.name .. "  is eating")
-    end
-})
+--     constructor = function(self)
+
+--     end,
+
+--     eat = function(self)
+--         print("Dog: " .. self.name .. "  is eating")
+--     end
+-- })
+
+-- ClassExtends(Dog, Animal)
 
 
-local myAnimal = Animal('My animal')
-local myDog = Dog()
-myDog:eat()
+-- local myAnimal = New(Animal)
+-- local myDog = New(Dog)
+-- myDog:eat()
+
+local MyClass = Class()
+MyClass.name = 'MyClass'
+
+function MyClass.constructor(self, name)
+    self.name = name
+    print('Name of class: ' .. self.name)
+end
+
+local tstClass = New(MyClass, 'tstClass')
