@@ -25,6 +25,7 @@ function ClassExtends(target, base)
             staticMetatable.__newindex = baseMetatable.__newindex
         end
     end
+    
     setmetatable(target, base)
     if (type(base.__index) == 'function') then
         target.__index = base.__index
