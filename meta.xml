@@ -1,0 +1,4 @@
+<meta>
+    <script src='class.lua' type='shared' />
+    <script src='test.lua' type='shared' />
+</meta>
