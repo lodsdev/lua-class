@@ -1,13 +1,25 @@
-local Animal = Class:new({
+local Animal = Class:create({
     constructor = function(self, name)
         self.name = name
-        -- print(self.name)
     end,
 
     eat = function(self)
-        print(self.name .. " is eating")
+        print("Animal: " .. self.name .. "  is eating")
     end
 })
 
-local dog = Animal('Pitbull')
-dog:eat()
+local Dog = Class:extends(Animal, {
+    constructor = function(self)
+        self.name = "Dog"
+    end,
+
+    eat = function(self)
+        Animal.eat()
+        print("Dog: " .. self.name .. "  is eating")
+    end
+})
+
+
+local myAnimal = Animal('My animal')
+local myDog = Dog()
+myDog:eat()
