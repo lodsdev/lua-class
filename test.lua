@@ -27,35 +27,24 @@
 -- local myDog = New(Dog)
 -- myDog:eat()
 
--- local MyClass = Class()
--- MyClass.name = 'MyClass'
-
--- function MyClass.constructor(self, name)
---     self.name = name
---     print('Name of class: ' .. self.name)
--- end
-
--- local tstClass = New(MyClass, 'tstClass')
-
--- iprint(tstClass)
-
-
+    
 local Animal = Class({
-    constructor = function(self)
+    constructor = function(self, name)
+        self.name = name
     end,
 
     eat = function(self)
-        print('Animal is eating...')
+        print('Animal of name ' .. self.name .. ' is eating...')
     end
 })
 
 local Dog = ClassExtends({
     constructor = function(self)
-
+        print(self.name)
     end
 }, Animal)
 
-local anim = Animal()
-local dog = Dog('dog')
+local anim = Animal('MyAnimal')
+local dog = Dog()
 
-dog:eat()
+anim:eat()
