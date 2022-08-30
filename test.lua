@@ -1,33 +1,3 @@
--- local Animal = Class({
---     constructor = function(self, name)
---         self.name = name
---     end,
-
---     eat = function(self)
---         print("Animal: " .. self.name .. "  is eating")
---     end
--- })
-
--- local Dog = Class({
---     name = 'Dog',
-
---     constructor = function(self)
-
---     end,
-
---     eat = function(self)
---         print("Dog: " .. self.name .. "  is eating")
---     end
--- })
-
--- ClassExtends(Dog, Animal)
-
-
--- local myAnimal = New(Animal)
--- local myDog = New(Dog)
--- myDog:eat()
-
-    
 local Animal = Class({
     constructor = function(self, name)
         self.name = name
@@ -38,13 +8,17 @@ local Animal = Class({
     end
 })
 
-local Dog = ClassExtends({
-    constructor = function(self)
-        print(self.name)
+local Vehicle = Class({
+    constructor = function(self, model)
+        self.model = model
+    end,
+
+    create = function(self, pos)
+        local x, y, z = unpack(pos)
+
+        print('Vehicle of model ' .. self.model .. ' is created at ' .. x .. ' ' .. y .. ' ' .. z)
     end
-}, Animal)
+})
 
-local anim = Animal('MyAnimal')
-local dog = Dog()
-
-anim:eat()
+local vehicle = Vehicle(481)
+vehicle:create({0, 0, 0})
