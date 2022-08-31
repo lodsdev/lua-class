@@ -57,7 +57,7 @@ function Class:new()
             __index = cls
         })
 
-        Class:constructor(...)
+        instance:constructor(...)
     end
     setmetatable(instance, {
         __index = Class
