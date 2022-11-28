@@ -1,50 +1,68 @@
-function Class(tbl)
-    setmetatable(tbl, {
-        __call = function(cls, ...)
-            local self = {}
-            
-            setmetatable(self, {
-                __index = cls
-            })
-            
-            self:constructor(...)
+local classes = {}
+-- local subObj = {}
+local objAmount = 0
 
-            return self
-        end
-    })
-    return tbl
+function table.copy(t, mt)
+    local t2 = {}
+    for k, v in pairs(t) do
+        t2[k] = v
+    end
+    if (mt) then
+        setmetatable(t2, mt)
+    end
+    return t2
 end
 
-function ClassExtends(target, base)
-    local ClassExtended = {}
+-- function subObj:extend(superClassName)
+--     return function(subClass)
+--         local super = classes[superClassName]
+--         if (not super) then
+--             error('Super class ' .. superClassName .. ' not found', 2)
+--         end
 
-    ClassExtended = base
-    target.super = base
+--         setmetatable(subClass, { __index = super.array })
 
-    local staticMetatable = setmetatable({__index = base}, base)
-    setmetatable(ClassExtended, staticMetatable)
-    local baseMetatable = getmetatable(base)
-    
-    if (baseMetatable) then
-        if (type(baseMetatable.__index) == 'function') then
-            staticMetatable.__index = baseMetatable.__index
+--         return subClass
+--     end
+-- end
+
+function class(subClassName)
+    return function(tbl)
+        local subClass = classes[subClassName]
+        
+        if (not subClass) then
+            classes[subClassName] = { name = subClassName, array = tbl }
         end
-        if (type(baseMetatable.__newindex) == 'function') then
-            staticMetatable.__newindex = baseMetatable.__newindex
-        end
-    end
 
-    setmetatable(ClassExtended, base)
-    if (type(base.__index) == 'function') then
-        ClassExtended.__index = base.__index
+        return tbl
     end
-    if (type(base.__newindex) == 'function') then
-        ClassExtended.__newindex = base.__newindex
-    end
-    if (type(base.__tostring) == 'function') then
-        ClassExtended.__tostring = base.__tostring
-    end
-
-    return Class(ClassExtended)
 end
 
+function new(className)
+    return function(...)
+        local classe = classes[className]
+        if (not classe) then error('Class ' .. className .. ' not found', 2) end
+
+        local obj = table.copy(classe.array, getmetatable(classe.array))
+
+        if (obj.constructor) then
+            obj.constructor(obj, ...)
+        end
+
+        objAmount = objAmount + 1
+        return obj
+    end
+end
+
+function extend(superClassName)
+    return function(subClass)
+        local super = classes[superClassName]
+        if (not super) then
+            error('Super class ' .. superClassName .. ' not found', 2)
+        end
+
+        setmetatable(subClass, { __index = super.array })
+
+        return subClass
+    end
+end

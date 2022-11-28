@@ -1,6 +1,6 @@
 <meta>
-    <!-- <script src='class-oop.lua' type='shared' /> -->
-    <!-- <script src='test.lua' type='shared' /> -->
-    <script src='test-class.lua' type='shared' />
-    <script src='test-access-control.lua' type='shared' />
+    <script src='class-oop.lua' type='shared' />
+    <script src='test.lua' type='shared' />
+    <!-- <script src='test-class.lua' type='shared' /> -->
+    <!-- <script src='test-access-control.lua' type='shared' /> -->
 </meta>
