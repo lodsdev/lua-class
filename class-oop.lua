@@ -1,128 +1,123 @@
--- local classes = {}
--- local interfaces = {}
--- local objAmount = 0
+local classes = {}
+local interfaces = {}
 
--- function table.copy(t, mt)
---     local t2 = {}
---     for k, v in pairs(t) do
---         t2[k] = v
---     end
---     if (mt) then
---         setmetatable(t2, mt)
---     end
---     return t2
--- end
+local function tblCopy(t, mt)
+    local t2 = {}
+    for i, v in pairs(t) do
+        if (not t2[i]) then
+            t2[i] = v
+        end
+    end
+    if (mt) then
+        t2.super = mt
+        setmetatable(t2, { __index = t2.super.array })
+    end
+    return t2
+end
 
--- function interface(name)
---     return function(tbl)
---         if (not interfaces[name]) then
---             interfaces[name] = {}
---         end
-        
---         for i, v in pairs(tbl) do
---             interfaces[name][v] = v
---         end
+function class(className)
+    return function(tbl, super)
+        local class = classes[className]
+        if (not class) then
+            if (super) then
+                super._name = super.name
+            end
+            tbl._name = className
+            classes[className] = { name = className, array = tbl, super = super }
+        end
+        return tbl
+    end
+end
 
---         return interfaces[name]
---     end
--- end
+function new(className)
+    return function(...)
+        local classe = classes[className]
+        if (not classe) then error('Class ' .. className .. ' not found') end
 
--- function implements(interfaceName)
---     return function(tbl)
---         if (not interfaces[interfaceName]) then error('Interface ' .. interfaceName .. ' not found', 2) end
+        local super = (classe.super and classe.super or false)
+        local obj = tblCopy(classe.array, (super and super or false))
 
---         for i, v in pairs(interfaces[interfaceName]) do
---             if (not tbl[v]) then
---                 error('Interface ' .. interfaceName .. ' not implemented, method ' .. v .. ' not found', 2)
---             end
---         end
+        obj.overload = function(tbl, ...)
+            local args = {...}
+            local func = tbl[#args]
+            func(obj, ...)
+        end
 
---         return tbl
---     end
--- end
+        if (obj.constructor) then
+            obj:constructor(...)
+        end
+        return obj
+    end
+end
 
--- function class(subClassName)
---     return function(tbl, super)
---         local subClass = classes[subClassName]
-        
---         if (not subClass) then
---             classes[subClassName] = { name = subClassName, array = tbl, super = super }
---         end
+function extends(superObjName)
+    return function(tbl)
+        local super
 
---         return tbl
---     end
--- end
+        if (classes[superObjName]) then 
+            super = classes[superObjName]
+            setmetatable(tbl, {__index = super.array})
+        elseif (interfaces[superObjName]) then
+            super = interfaces[superObjName]
+            for i, v in pairs(super) do
+                tbl[i] = v
+            end
+        end
 
--- function new(className)
---     return function(...)
---         local classe = classes[className]
---         if (not classe) then error('Class ' .. className .. ' not found', 2) end
+        return tbl, super
+    end
+end
 
---         local super = classe.super
---         local obj = tblCopy(classe.array)
---         obj.super = super.array
---         obj.super._name = super._name
---         obj._name = className
+function destroyClass(instance)
+    local classe = classes[instance._name]
+    if (not classe) then error('Class ' .. instance._name .. ' not found') end
 
---         setmetatable(obj, {
---             __index = function(t, k)
---                 if (t.super[k]) then
---                     return t.super[k]
---                 end
---             end,
---             __newindex = function(t, k, v)
---                 if (t.super[k]) then
---                     t.super[k] = v
---                 end
---             end,
---             __gc = function(t)
---                 if (t.destructor) then
---                     t:destructor()
---                 end
---             end
---         })
+    if (classes[instance._name].array.destructor) then
+        classes[instance._name].array:destructor()
+    end
+    -- classes[instance._name] = nil
+    instance = nil
+end
 
---         if (obj.constructor) then
---             obj:constructor(...)
---         end
+function interface(interfaceName)
+    return function(tbl)
+        if (not interfaces[interfaceName]) then
+            interfaces[interfaceName] = {}
+        end
 
---         return obj
---     end
--- end
+        for i, v in pairs(tbl) do
+            interfaces[interfaceName][v] = v
+        end
 
--- function extend(superClassName)
---     return function(subClass)
---         local super = classes[superClassName]
---         if (not super) then
---             error('Super class ' .. superClassName .. ' not found', 2)
---         end
+        return tbl
+    end
+end
 
---         setmetatable(subClass, { __index = super.array })
+function implements(interfaceName)
+    return function(tbl)
+        if (not interfaces[interfaceName]) then error('Interface ' .. interfaceName .. ' not found') end
 
---         return subClass
---     end
--- end
+        for i, v in pairs(interfaces[interfaceName]) do
+            if (not tbl[v]) then
+                error('Interface ' .. interfaceName .. ' not implemented, method ' .. v .. ' not found')
+            end
+        end
 
--- function destroy(instance)
---     if (instance.destructor) then
---         instance.destructor()
---         setmetatable(instance, nil)
---         return true
---     end
---     return false
--- end
+        return tbl
+    end
+end
 
--- function instanceOf(instance, className)
---     local classe = classes[className]
---     if (not classe) then error('Class ' .. className .. ' not found', 2) end
+function instanceOf(instance, className)
+    local classe = classes[className]
+    if (not classe) then error('Class ' .. className .. ' not found', 2) end
 
---     if (instance._name == className) then
---         return true
---     end
+    if (instance._name == className) then
+        return true
+    end
 
---     if (instance.super) then
---         return instanceOf(instance.super, className)
---     end
+    if (instance.super) then
+        return instanceOf(instance.super, className)
+    end
 
---     return false
--- end
+    return false
+end

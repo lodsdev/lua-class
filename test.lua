@@ -14,6 +14,11 @@ class 'A' {
     constructor = function(self)
 
     end,
+
+    destructor = function(self)
+        print('exec method destructor')
+    end,
+
     center = function(self)
         print('center')
     end
@@ -41,14 +46,9 @@ class 'C' (extends 'B' (implements 'iPhone' {
 class 'D' (extends 'C' {
     constructor = function(self)
     end,
-
-    overload = function(self)
-
-    end
 })
 
 local a = new 'A'()
 local b = new 'B'()
 local c = new 'C'()
 local d = new 'D'()
-d:call()

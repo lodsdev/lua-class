@@ -1,17 +1,6 @@
 local classes = {}
 local interfaces = {}
 
--- function iprint(tbl, indent)
---     indent = indent or 0
---     for k, v in pairs(tbl) do
---         if (type(v) == 'table') then
---             print(string.rep(' ', indent) .. k .. ':')
---         else
---             print(string.rep(' ', indent) .. k .. ': ' .. tostring(v))
---         end
---     end
--- end
-
 local function tblCopy(t, mt)
     local t2 = {}
     for i, v in pairs(t) do
@@ -19,24 +8,11 @@ local function tblCopy(t, mt)
             t2[i] = v
         end
     end
-    -- for i, v in pairs(mt) do
-    --     if (not t2[i]) then
-    --         t2[i] = v
-    --     end
-    -- end
     if (mt) then
         t2.super = mt
         setmetatable(t2, { __index = t2.super.array })
     end
     return t2
-end
-
-local function strSplit(str, pat)
-    local t = {}
-    for i in string.gmatch(str, '([^' .. pat .. ']+)') do
-        t[#t+1] = i
-    end
-    return t
 end
 
 function class(className)
@@ -61,37 +37,26 @@ function new(className)
         local super = (classe.super and classe.super or false)
         local obj = tblCopy(classe.array, (super and super or false))
 
-        -- obj.overload = function(tbl, ...)
-            -- iprint())
-            -- getArgs(tbl[1])
-            -- local funcsById = {}
-            -- for i, v in pairs(tbl) do
-            --     funcsById[getArgs(v)] = v
-            -- end
+        obj.overload = function(tbl, ...)
+            local args = {...}
+            local func = tbl[#args]
+            func(obj, ...)
+        end
 
-            -- local args = {...}
-            -- local func = funcsById[#args]
-            -- func(obj, ...)
-        -- end
         if (obj.constructor) then
             obj:constructor(...)
         end
-
         return obj
     end
 end
 
-function extend(superObjName)
-    return function(tbl, ...)
+function extends(superObjName)
+    return function(tbl)
         local super
-        -- local args = {...}
 
         if (classes[superObjName]) then 
             super = classes[superObjName]
-
-            setmetatable(tbl, {
-                __index = super.array
-            })
+            setmetatable(tbl, {__index = super.array})
         elseif (interfaces[superObjName]) then
             super = interfaces[superObjName]
             for i, v in pairs(super) do
@@ -101,6 +66,17 @@ function extend(superObjName)
 
         return tbl, super
     end
+end
+
+function destroyClass(instance)
+    local classe = classes[instance._name]
+    if (not classe) then error('Class ' .. instance._name .. ' not found') end
+
+    if (classes[instance._name].array.destructor) then
+        classes[instance._name].array:destructor()
+    end
+    -- classes[instance._name] = nil
+    instance = nil
 end
 
 function interface(interfaceName)
