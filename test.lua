@@ -1,46 +1,41 @@
 -- require('new-class')
 
--- interface 'telePhone' {
---     'call',
---     'hangUp'
--- }
-
--- interface 'iPhone' (extend 'telePhone' {
---     'sendSMS',
---     'receiveSMS'
--- })
-
-class 'Tmp' {
-    constructor = function(self, count)
-        print('constructor' .. count)
-    end,
-
-    say = function(self)
-        print(self._name)
-    end
+interface 'telePhone' {
+    'call',
+    'hangUp'
 }
 
-class 'Vinicenter' {
+interface 'iPhone' (extend 'telePhone' {
+    'sendSMS',
+    'receiveSMS'
+})
+
+class 'A' {
     constructor = function(self)
 
     end,
-
     center = function(self)
         print('center')
     end
 }
 
-class 'Lods' (extend 'Tmp' (extend 'Vinicenter' {
-    constructor = function(self, num)
-        self.num = num
+class 'B' (extend 'A' {
+    constructor = function(self)
     end,
-    
     say = function(self)
-        print(self._name)
-        self.super:say()
+        print('say')
     end
+})
+
+class 'C' (extend 'B' (implements 'iPhone' {
+    constructor = function(self)
+    end,
+    call = function() end,
+    receiveSMS = function() end,
+    sendSMS = function() end,
 }))
 
-local lods = new 'Lods'(2)
--- iprint(lods)
--- lods:center()
+local a = new 'A'()
+local b = new 'B'()
+local c = new 'C'()
+c:center()
