@@ -68,17 +68,6 @@ function extends(superObjName)
     end
 end
 
-function destroyClass(instance)
-    local classe = classes[instance._name]
-    if (not classe) then error('Class ' .. instance._name .. ' not found') end
-
-    if (classes[instance._name].array.destructor) then
-        classes[instance._name].array:destructor()
-    end
-    -- classes[instance._name] = nil
-    instance = nil
-end
-
 function interface(interfaceName)
     return function(tbl)
         if (not interfaces[interfaceName]) then
