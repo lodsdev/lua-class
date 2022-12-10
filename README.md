@@ -23,9 +23,9 @@ class 'Animal' {
 }
 ```
 
-## Creating objects
+## Instantiating
 
-To create an object from a class, simply call the `new` function and pass the class name and the parameters of the constructor. For example:
+To instantiate an object, simply call the `new` function and pass the class name and the arguments of the constructor. For example:
 
 ```lua
 local dog = new 'Animal'('Dog', 'Mammal')
@@ -75,6 +75,33 @@ class 'Dog' (extends 'Animal' {
         print('Woof! My name is ' .. self.name .. '.')
     end
 })
+```
+
+
+### Method overloading
+
+The **Lua Class** library also supports method overloading. This means that a class can have multiple methods with the same name, but with different parameters. To overload a method, simply call the `self.overload` function and pass a table containing the different implementations of the method as arguments, but the index of the table must be the number of parameters of the method. For example:
+
+```lua
+class 'Calculator' {
+    constructor = function(self)
+    end,
+
+    add = function(self, ...)
+        self.overload ({
+            [2] = function(self, a, b)
+                return a + b
+            end,
+            [3] = function(self, a, b, c)
+                return a + b + c
+            end
+        }, ...)
+    end
+}
+
+local calc = new 'Calculator'()
+calc:add(1, 2) -- 3
+calc:add(1, 2, 3) -- 6
 ```
 
 ## Interfaces
@@ -127,32 +154,6 @@ interface 'smartPhone' (extends 'telePhone' {
     'touchScreen',
     'internet'
 })
-```
-
-## Method overloading
-
-The **Lua Class** library also supports method overloading. This means that a class can have multiple methods with the same name, but with different parameters. To overload a method, simply call the `self.overload` function and pass a table containing the different implementations of the method as arguments, but the index of the table must be the number of parameters of the method. For example:
-
-```lua
-class 'Calculator' {
-    constructor = function(self)
-    end,
-
-    add = function(self, ...)
-        self.overload ({
-            [2] = function(self, a, b)
-                return a + b
-            end,
-            [3] = function(self, a, b, c)
-                return a + b + c
-            end
-        }, ...)
-    end
-}
-
-local calc = new 'Calculator'()
-calc:add(1, 2) -- 3
-calc:add(1, 2, 3) -- 6
 ```
 
 ## instanceof
