@@ -112,4 +112,4 @@ class 'SmartPhone' (implements 'telePhone' {
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/lodsdev/lua-oop/blob/main/MIT-LICENSE.txt) file for details
