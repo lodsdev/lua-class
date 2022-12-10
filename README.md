@@ -6,7 +6,9 @@ The **Lua Class** library provides support for object-oriented programming in Lu
 
 ## Installation
 
-Just download file `class-oop.lua` and put it in your project directory. it will work in any project that uses Lua. This library he was created and tested on Lua 5.1
+Just download file `class-oop.lua` and put it in your project directory. it will work in any project that uses Lua. 
+
+* Note: This library he was created and tested on Lua 5.1
 
 ## Creating classes
 
