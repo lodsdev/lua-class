@@ -112,7 +112,7 @@ class 'SmartPhone' (implements 'telePhone' {
 
 ## Inheritance of interfaces
 
-The **Lua Class** library also supports inheritance of interfaces. This means that a class can implement an interface that inherits from another interface. To make a class implement an interface that inherits from another interface, simply pass the interface name as an argument to the `implements` function. For example:
+The **Lua Class** library also supports inheritance of interfaces. This means that a class can implement an interface that inherits from another interface. To make a class implement an interface that inherits from another interface, simply pass the interface name as an argument to the `extends` function. For example:
 
 ```lua
 interface 'telePhone' {
@@ -127,6 +127,40 @@ interface 'smartPhone' (extends 'telePhone' {
 })
 ```
 
+## Method overloading
+
+The **Lua Class** library also supports method overloading. This means that a class can have multiple methods with the same name, but with different parameters. To overload a method, simply call the `self.overload` function and pass a table containing the different implementations of the method as arguments, but the index of the table must be the number of parameters of the method. For example:
+
+```lua
+class 'Calculator' {
+    constructor = function(self)
+    end,
+
+    add = function(self, ...)
+        self.overload ({
+            [2] = function(self, a, b)
+                return a + b
+            end,
+            [3] = function(self, a, b, c)
+                return a + b + c
+            end
+        }, ...)
+    end
+}
+
+local calc = new 'Calculator'()
+calc:add(1, 2) -- 3
+calc:add(1, 2, 3) -- 6
+```
+
+## instanceof
+
+The **Lua Class** library also supports the `instanceof` operator. This operator is used to check if an object is an instance of a class. For example:
+
+```lua
+local dog = new 'Animal'('Dog', 'Mammal')
+print(instanceOf(dog, 'Animal')) -- true
+```
 
 ## License
 
