@@ -110,6 +110,24 @@ class 'SmartPhone' (implements 'telePhone' {
 })
 ```
 
+## Inheritance of interfaces
+
+The **Lua Class** library also supports inheritance of interfaces. This means that a class can implement an interface that inherits from another interface. To make a class implement an interface that inherits from another interface, simply pass the interface name as an argument to the `implements` function. For example:
+
+```lua
+interface 'telePhone' {
+    'call',
+    'sendSMS',
+    'receiveSMS'
+}
+
+interface 'smartPhone' (extends 'telePhone' {
+    'touchScreen',
+    'internet'
+})
+```
+
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/lodsdev/lua-oop/blob/main/MIT-LICENSE.txt) file for details
