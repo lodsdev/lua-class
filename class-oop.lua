@@ -1,8 +1,8 @@
 --[[
-    MIT License
-    
     Author: https://github.com/lodsdev
-    Version: 1.0.0
+    Version: 1.0
+    
+    MIT License
 
     Copyright (c) 2012-2022 Scott Chacon and others
 
