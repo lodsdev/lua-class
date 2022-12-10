@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The **Lua Class** library provides support for object-oriented programming in Lua. With it, you can create classes and objects easily and intuitively, using concepts such as inheritance, polymorphism, interfaces and method overloading. [ Still in improvement ]
+The **Lua Class** library provides support for object-oriented programming in Lua. With it, you can create classes and objects easily and intuitively, using concepts such as inheritance, polymorphism, interfaces and method overloading. **[ Still in improvement ]**
 
 ## Installation
 
