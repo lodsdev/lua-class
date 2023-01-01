@@ -40,6 +40,10 @@ class 'Animal' {
     constructor = function(self, name, type)
         self.name = name
         self.type = type
+    end,
+
+    eat = function(self)
+        print('Eating...')
     end
 }
 
@@ -48,6 +52,10 @@ class 'Dog' (extends 'Animal' {
         self.name = name
     end
 })
+
+local dog = new 'Dog'('Bob')
+dog:eat() -- Eating...
+
 ```
 
 ## Polymorphism
