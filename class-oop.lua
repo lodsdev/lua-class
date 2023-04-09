@@ -44,6 +44,29 @@ local function tblCopy(t, mt)
     return t2
 end
 
+local function getArgsName(fun)
+    local args = {}
+    local hook = debug.gethook()
+
+    local argHook = function(...)
+        local info = debug.getinfo(3)
+        if ('pcall' ~= info.name) then return end
+
+        for i = 1, math.huge do
+        local name, value = debug.getlocal(2, i)
+        if ('(*temporary)' == name) then
+            debug.sethook(hook)
+            return
+        end
+        table.insert(args, name)
+        end
+    end
+
+    debug.sethook(argHook, 'c')
+    pcall(fun)
+    return args
+end
+
 function class(className)
     return function(tbl, super)
         local class = classes[className]
@@ -73,6 +96,14 @@ function new(className)
         end
 
         if (obj.constructor) then
+            local valuesFunc = {...}
+            local argsConstructor = getArgsName(obj.constructor)
+            for i, v in pairs(argsConstructor) do
+                if (v ~= 'self') then
+                    local index = i - 1
+                    obj[v] = valuesFunc[index]
+                end
+            end
             obj:constructor(...)
         end
         return obj
@@ -139,3 +170,12 @@ function instanceOf(instance, className)
 
     return false
 end
+
+-- return {
+--     class = class,
+--     new = new,
+--     extends = extends,
+--     interface = interface,
+--     implements = implements,
+--     instanceOf = instanceOf
+-- }
