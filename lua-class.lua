@@ -1,29 +1,6 @@
 --[[
     Author: https://github.com/lodsdev
-    Version: 1.0
-    
-    MIT License
-
-    Copyright (c) 2012-2022 Scott Chacon and others
-
-    Permission is hereby granted, free of charge, to any person obtaining
-    a copy of this software and associated documentation files (the
-    "Software"), to deal in the Software without restriction, including
-    without limitation the rights to use, copy, modify, merge, publish,
-    distribute, sublicense, and/or sell copies of the Software, and to
-    permit persons to whom the Software is furnished to do so, subject to
-    the following conditions:
-
-    The above copyright notice and this permission notice shall be
-    included in all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-    LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-    WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    Version: 2.0.0
 ]]
 
 local classes = {}
@@ -39,70 +16,119 @@ local function table_copy(t)
     return newTbl
 end
 
-function interface(interfaceName)
-    return function(tbl)
-        if (not interfaces[interfaceName]) then
-            interfaces[interfaceName] = {}
-        end
-
-        local instance = {}
-        for i, v in pairs(tbl) do
-            instance[v] = v
-        end
-
-        interfaces[interfaceName] = instance
-        return tbl
+local function table_implements(t, t2)
+    local newTbl = {}
+    for k, v in ipairs(t2) do
+        t[#t+1] = v
     end
+    newTbl = table_copy(t)
+    return newTbl
+end
+
+local function createClass(className, structure, superClass)
+    if (classes[className]) then
+        error('Class ' .. className .. ' already exists.', 2)
+    end
+
+    local newClass = structure
+    newClass.__name = className
+
+    if (superClass) then
+        newClass.super = superClass
+        setmetatable(newClass, { __index = newClass.super })
+    end
+
+    classes[className] = newClass
+    return newClass
+end
+
+function interface(interfaceName)
+    local newInterface = {}
+
+    setmetatable(newInterface, {
+        __call = function(self, ...)
+            if (interfaces[interfaceName]) then
+                error('Interface ' .. interfaceName .. ' already exists.', 2)
+            end
+
+            local newInstance = ...
+            interfaces[interfaceName] = newInstance
+            return newInstance
+        end
+    })
+
+    newInterface.extends = function(self, superInterfaceName)
+        return function(subInterface)
+            local superInterface = interfaces[superInterfaceName]
+            local newInstance = table_implements(subInterface, superInterface)
+
+            if (interfaces[interfaceName]) then
+                error('Interface ' .. interfaceName .. ' already exists.', 2)
+            end
+
+            interfaces[interfaceName] = newInstance
+            return newInstance
+        end
+    end
+
+    return newInterface
 end
 
 function class(className)
     local newClasse = {}
+    local modifiers = {
+        extends = function(self, superClassName)
+            return function(subClass)
+                local superClass = classes[superClassName]
+                local classCreated = createClass(className, subClass, superClass)
+                return classCreated
+            end
+        end,
+
+        implements = function(self, ...)
+            local interfacesNames = {...}
+            return function(subClass)
+                local classeCreated = createClass(className, subClass)
+
+                for _, v in pairs(interfacesNames) do
+                    if (not interfaces[v]) then
+                        error('Interface ' .. v .. ' not found', 2)
+                    end
+
+                    for _, method in pairs(interfaces[v]) do
+                        if (not subClass[method]) then
+                            error('Interface ' .. v .. ' not implemented, method ' .. method .. ' not found', 2)
+                        end
+                    end
+                end
+
+                return classeCreated
+            end
+        end
+    }
 
     setmetatable(newClasse, {
+        __index = function (self, key)
+            if (modifiers[key]) then
+                return modifiers[key]
+            end
+
+            if (classes[className]) then
+                return classes[className][key]
+            end
+
+            error('Class ' .. className .. ' not found', 2)
+        end,
+
         __call = function(self, ...)
             if (classes[className]) then
                 error('Class ' .. className .. ' already exists.', 2)
             end
 
-            local newInstance = table_copy(...)
-            newInstance.__name = className
-
-            classes[className] = newInstance
+            local newInstance = createClass(className, ...)
             return newInstance
         end
     })
-
-    newClasse.extends = function(self, superClassName)
-        return function(subClass)
-            local superClass = classes[superClassName]
-            subClass.__name = className
-            subClass.super = superClass
-
-            if (classes[className]) then
-                error('Class ' .. className .. ' already exists.', 2)
-            end
-
-            setmetatable(subClass, { __index = subClass.super.public })
-            classes[className] = subClass
-        end
-    end
-
-    newClasse.implements = function(self, ...)
-        local interfacesNames = {...}
-        return function(subClass)
-            for _, v in pairs(interfacesNames) do
-                if (not interfaces[v]) then
-                    error('Interface ' .. v .. ' not found', 2)
-                end
-
-                for _, method in pairs(interfaces[v]) do
-                    if (not subClass[method]) then
-                        error('Interface ' .. v .. ' not implemented, method ' .. method .. ' not found', 2)
-                    end
-                end
-            end
-        end
-    end
 
     return newClasse
 end
@@ -126,10 +152,6 @@ function instanceOf(instance, className)
     local classe = classes[className]
     if (not classe) then
         error('Class ' .. className .. ' not found', 2)
-    end
-    
-    if (instance.super) then
-        return instanceOf(instance.super, className)
     end
 
     if (instance.__name == className) then
