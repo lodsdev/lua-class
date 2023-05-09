@@ -47,11 +47,11 @@ class 'Animal' {
     end
 }
 
-class 'Dog' (extends 'Animal' {
+class 'Dog' : extends 'Animal' {
     constructor = function(self, name)
         self.name = name
     end
-})
+}
 
 local dog = new 'Dog'('Bob')
 dog:eat() -- Eating...
@@ -74,7 +74,7 @@ class 'Animal' {
     end
 }
 
-class 'Dog' (extends 'Animal' {
+class 'Dog' : extends 'Animal' {
     constructor = function(self, name)
         self.name = name
     end,
@@ -82,34 +82,7 @@ class 'Dog' (extends 'Animal' {
     speak = function(self)
         print('Woof! My name is ' .. self.name .. '.')
     end
-})
-```
-
-
-### Method overloading
-
-The **Lua Class** library also supports method overloading. This means that a class can have multiple methods with the same name, but with different parameters. To overload a method, simply call the `self.overload` function and pass a table containing the different implementations of the method as arguments, but the index of the table must be the number of parameters of the method. For example:
-
-```lua
-class 'Calculator' {
-    constructor = function(self)
-    end,
-
-    add = function(self, ...)
-        self.overload ({
-            [2] = function(self, a, b)
-                return a + b
-            end,
-            [3] = function(self, a, b, c)
-                return a + b + c
-            end
-        }, ...)
-    end
 }
-
-local calc = new 'Calculator'()
-calc:add(1, 2) -- 3
-calc:add(1, 2, 3) -- 6
 ```
 
 ## Interfaces
@@ -128,7 +101,7 @@ interface 'telePhone' {
 To make a class implement an interface, simply pass the interface name as an argument to the `implements` function. For example:
 
 ```lua
-class 'SmartPhone' (implements 'telePhone' {
+class 'SmartPhone' : implements 'telePhone' {
     constructor = function(self, number)
         self.number = number
     end,
@@ -144,7 +117,50 @@ class 'SmartPhone' (implements 'telePhone' {
     receiveSMS = function(self, number, message)
         print('Received SMS from ' .. number .. ' to ' .. self.number .. '...')
     end
-})
+}
+```
+
+### Multiple interfaces
+
+The **Lua Class** library also supports multiple interfaces. This means that a class can implement multiple interfaces. To make a class implement multiple interfaces, simply pass the interface names as arguments to the `implements` function. For example:
+
+```lua
+interface 'telePhone' {
+    'call',
+    'sendSMS',
+    'receiveSMS'
+}
+
+interface 'smartPhone' {
+    'touchScreen',
+    'internet'
+}
+
+class 'SmartPhone' : implements ('telePhone', 'smartPhone') {
+    constructor = function(self, number)
+        self.number = number
+    end,
+
+    call = function(self, number)
+        print('Calling ' .. number .. ' from ' .. self.number .. '...')
+    end,
+
+    sendSMS = function(self, number, message)
+        print('Sending SMS to ' .. number .. ' from ' .. self.number .. '...')
+    end,
+
+    receiveSMS = function(self, number, message)
+        print('Received SMS from ' .. number .. ' to ' .. self.number .. '...')
+    end,
+
+    touchScreen = function(self)
+        print('Touching screen...')
+    end,
+
+    internet = function(self)
+        print('Accessing internet...')
+    end
+}
 ```
 
 ## Inheritance of interfaces
@@ -158,10 +174,10 @@ interface 'telePhone' {
     'receiveSMS'
 }
 
-interface 'smartPhone' (extends 'telePhone' {
+interface 'smartPhone' : extends 'telePhone' {
     'touchScreen',
     'internet'
-})
+}
 ```
 
 ## instanceof
