@@ -26,75 +26,17 @@
     WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ]]
 
-
 local classes = {}
 local interfaces = {}
 
-local function tblCopy(t, mt)
-    local t2 = {}
+local function table_copy(t)
+    local newTbl = {}
     for i, v in pairs(t) do
-        if (not t2[i]) then
-            t2[i] = v
+        if (not newTbl[i]) then
+            newTbl[i] = v
         end
     end
-    if (mt) then
-        t2.super = mt
-        setmetatable(t2, { __index = t2.super.array })
-    end
-    return t2
-end
-
-function class(className)
-    return function(tbl, super)
-        local class = classes[className]
-        if (not class) then
-            if (super) then
-                super._name = super.name
-            end
-            tbl._name = className
-            classes[className] = { name = className, array = tbl, super = super }
-        end
-        return tbl
-    end
-end
-
-function new(className)
-    return function(...)
-        local classe = classes[className]
-        if (not classe) then error('Class ' .. className .. ' not found') end
-
-        local super = (classe.super and classe.super or false)
-        local obj = tblCopy(classe.array, (super and super or false))
-
-        obj.overload = function(tbl, ...)
-            local args = {...}
-            local func = tbl[#args]
-            func(obj, ...)
-        end
-
-        if (obj.constructor) then
-            obj:constructor(...)
-        end
-        return obj
-    end
-end
-
-function extends(superObjName)
-    return function(tbl)
-        local super
-
-        if (classes[superObjName]) then 
-            super = classes[superObjName]
-            setmetatable(tbl, {__index = super.array})
-        elseif (interfaces[superObjName]) then
-            super = interfaces[superObjName]
-            for i, v in pairs(super) do
-                tbl[i] = v
-            end
-        end
-
-        return tbl, super
-    end
+    return newTbl
 end
 
 function interface(interfaceName)
@@ -103,39 +45,100 @@ function interface(interfaceName)
             interfaces[interfaceName] = {}
         end
 
+        local instance = {}
         for i, v in pairs(tbl) do
-            interfaces[interfaceName][v] = v
+            instance[v] = v
         end
 
+        interfaces[interfaceName] = instance
         return tbl
     end
 end
 
-function implements(interfaceName)
-    return function(tbl)
-        if (not interfaces[interfaceName]) then error('Interface ' .. interfaceName .. ' not found') end
+function class(className)
+    local newClasse = {}
 
-        for i, v in pairs(interfaces[interfaceName]) do
-            if (not tbl[v]) then
-                error('Interface ' .. interfaceName .. ' not implemented, method ' .. v .. ' not found')
+    setmetatable(newClasse, {
+        __call = function(self, ...)
+            if (classes[className]) then
+                error('Class ' .. className .. ' already exists.', 2)
             end
+
+            local newInstance = table_copy(...)
+            newInstance.__name = className
+            newInstance.public = public
+            newInstance.private = private
+
+            classes[className] = newInstance
+            return newInstance
+        end
+    })
+
+    newClasse.extends = function(self, superClassName)
+        return function(subClass)
+            local superClass = classes[superClassName]
+            subClass.__name = className
+            subClass.super = superClass
+
+            if (classes[className]) then
+                error('Class ' .. className .. ' already exists.', 2)
+            end
+
+            setmetatable(subClass, { __index = subClass.super.public })
+            classes[className] = subClass
+        end
+    end
+
+    newClasse.implements = function(self, interfaceName)
+        return function(subClass)
+
+        end
+    end
+
+    return newClasse
+end
+
+function new(className)
+    return function(...)
+        local classe = classes[className]
+        if (not classe) then
+            error('Class ' .. className .. ' not found', 2)
         end
 
-        return tbl
+        if (classe.constructor) then
+            classe:constructor(...)
+        end
+
+        return classe
     end
 end
 
-function instanceOf(instance, className)
-    local classe = classes[className]
-    if (not classe) then error('Class ' .. className .. ' not found', 2) end
 
-    if (instance._name == className) then
-        return true
-    end
+-- function implements(interfaceName)
+--     return function(tbl)
+--         if (not interfaces[interfaceName]) then error('Interface ' .. interfaceName .. ' not found') end
 
-    if (instance.super) then
-        return instanceOf(instance.super, className)
-    end
+--         for i, v in pairs(interfaces[interfaceName]) do
+--             if (not tbl[v]) then
+--                 error('Interface ' .. interfaceName .. ' not implemented, method ' .. v .. ' not found')
+--             end
+--         end
 
-    return false
-end
+--         return tbl
+--     end
+-- end
+
+-- function instanceOf(instance, className)
+--     local classe = classes[className]
+--     if (not classe) then error('Class ' .. className .. ' not found', 2) end
+
+--     if (instance._name == className) then
+--         return true
+--     end
+
+--     if (instance.super) then
+--         return instanceOf(instance.super, className)
+--     end
+
+--     return false
+-- end
