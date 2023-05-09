@@ -87,9 +87,20 @@ function class(className)
         end
     end
 
-    newClasse.implements = function(self, interfaceName)
+    newClasse.implements = function(self, ...)
+        local interfacesNames = {...}
         return function(subClass)
+            for _, v in pairs(interfacesNames) do
+                if (not interfaces[v]) then
+                    error('Interface ' .. v .. ' not found', 2)
+                end
 
+                for _, method in pairs(interfaces[v]) do
+                    if (not subClass[method]) then
+                        error('Interface ' .. v .. ' not implemented, method ' .. method .. ' not found', 2)
+                    end
+                end
+            end
         end
     end
 
@@ -111,32 +122,19 @@ function new(className)
     end
 end
 
+function instanceOf(instance, className)
+    local classe = classes[className]
+    if (not classe) then
+        error('Class ' .. className .. ' not found', 2)
+    end
+    
+    if (instance.super) then
+        return instanceOf(instance.super, className)
+    end
 
--- function implements(interfaceName)
---     return function(tbl)
---         if (not interfaces[interfaceName]) then error('Interface ' .. interfaceName .. ' not found') end
+    if (instance.__name == className) then
+        return true
+    end
 
---         for i, v in pairs(interfaces[interfaceName]) do
---             if (not tbl[v]) then
---                 error('Interface ' .. interfaceName .. ' not implemented, method ' .. v .. ' not found')
---             end
---         end
-
---         return tbl
---     end
--- end
-
--- function instanceOf(instance, className)
---     local classe = classes[className]
---     if (not classe) then error('Class ' .. className .. ' not found', 2) end
-
---     if (instance._name == className) then
---         return true
---     end
-
---     if (instance.super) then
---         return instanceOf(instance.super, className)
---     end
-
---     return false
--- end
+    return false
+end

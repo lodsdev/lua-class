@@ -1,20 +1,25 @@
-class 'SuperTest' {
-    constructor = function(this)
+interface 'SuperTest' {
+    'mySuperTest',
+}
+
+class 'SuperTest' : implements 'SuperTest' {
+    constructor = function(self)
     end,
 
-    mySuperTest = function(this)
+    mySuperTest = function(self)
         iprint('testing inheritance lua oop.')
     end,
 }
 
 class 'Test' {
-    constructor = function(this)
+    constructor = function(self)
     end,
 
-    myTest = function(this)
-        iprint('testing myTest method lua oop.')
+    myTest = function(self)
     end,
 }
 
 local classTest = new 'Test'()
 classTest:myTest()
+
+iprint(instanceOf(classTest, 'Test'))

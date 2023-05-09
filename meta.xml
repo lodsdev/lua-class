@@ -1,4 +1,4 @@
 <meta>
-    <script src='class-oop.lua' type='shared' cache='false' />
+    <script src='lua-class.lua' type='shared' cache='false' />
     <script src='tst.lua' type='shared' cache='false' />
 </meta>
