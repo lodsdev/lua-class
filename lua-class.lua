@@ -66,8 +66,6 @@ function class(className)
 
             local newInstance = table_copy(...)
             newInstance.__name = className
-            newInstance.public = public
-            newInstance.private = private
 
             classes[className] = newInstance
             return newInstance
