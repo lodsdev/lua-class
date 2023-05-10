@@ -1,17 +1,19 @@
 class 'OuterClass' {
     x = 10,
 
-    class 'InnerClass' {
-        y = 5,
-    }
+    constructor = function (self)
+
+    end,
+
+    test = function(self)
+        print('OuterClass test')
+    end,
 }
 
-class 'Main' {
+class 'Main' : extends 'OuterClass' {
     constructor = function(self)
-        local  myOuter = new 'OuterClass'()
-        local myInner = new 'InnerClass'()
-        print(myInner.y + myOuter.x)
-    end
+    end,
 }
 
-new 'Main'()
+local main = new 'Main'()
+main:test()
