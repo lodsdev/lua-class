@@ -35,6 +35,7 @@ local function createClass(className, structure, superClass)
 
     if (superClass) then
         newClass.super = superClass
+        setmetatable(newClass, { __index = superClass })
     end
 
     classes[className] = newClass
@@ -137,10 +138,6 @@ function new(className)
         local classe = classes[className]
         if (not classe) then
             error('Class ' .. className .. ' not found', 2)
-        end
-
-        if (classe.super) then
-            setmetatable(classe, { __index = classe.super })
         end
 
         if (classe.constructor) then
