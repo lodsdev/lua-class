@@ -1,25 +1,17 @@
-interface 'SuperTest' {
-    'mySuperTest',
+class 'OuterClass' {
+    x = 10,
+
+    class 'InnerClass' {
+        y = 5,
+    }
 }
 
-class 'SuperTest' : implements 'SuperTest' {
+class 'Main' {
     constructor = function(self)
-    end,
-
-    mySuperTest = function(self)
-        iprint('testing inheritance lua oop.')
-    end,
+        local  myOuter = new 'OuterClass'()
+        local myInner = new 'InnerClass'()
+        print(myInner.y + myOuter.x)
+    end
 }
 
-class 'Test' {
-    constructor = function(self)
-    end,
-
-    myTest = function(self)
-    end,
-}
-
-local classTest = new 'Test'()
-classTest:myTest()
-
-iprint(instanceOf(classTest, 'Test'))
+new 'Main'()
