@@ -6,12 +6,16 @@
 local classes = {}
 local interfaces = {}
 
-local function table_copy(t)
+local function table_copy(t, st)
     local newTbl = {}
     for i, v in pairs(t) do
         if (not newTbl[i]) then
             newTbl[i] = v
         end
+    end
+    if (st) then
+        newTbl.super = st
+        setmetatable(newTbl, { __index = newTbl.super })
     end
     return newTbl
 end
@@ -140,11 +144,13 @@ function new(className)
             error('Class ' .. className .. ' not found', 2)
         end
 
-        if (classe.constructor) then
-            classe:constructor(...)
+        local super = classe.super
+        local newObj = table_copy(classe, super)
+        if (newObj.constructor) then
+            newObj:constructor(...)
         end
 
-        return classe
+        return newObj
     end
 end
 
