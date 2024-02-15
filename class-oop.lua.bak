@@ -84,7 +84,7 @@ function class(className)
     local modifiers = {
         extends = function(self, superClassName)
             return function(subClass)
-                local superClass = classes[superClassName]
+				local superClass = classes[superClassName]
                 local classCreated = createClass(className, subClass, superClass)
 				return classCreated
             end
