@@ -38,8 +38,8 @@ local function createClass(className, structure, superClass)
     newClass.__name = className
 
     if (superClass) then
-		newClass.super = superClass
-		newClass.baseClassName = superClass.__name -- let's store the name
+        newClass.super = superClass
+        newClass.baseClassName = superClass.__name -- let's store the name
         setmetatable(newClass, { __index = superClass })
     end
 
@@ -86,7 +86,7 @@ function class(className)
             return function(subClass)
                 local superClass = classes[superClassName]
                 local classCreated = createClass(className, subClass, superClass)
-				return classCreated
+                return classCreated
             end
         end,
 
@@ -157,7 +157,7 @@ end
 
 -- let's make a function similar to instanceOf
 function derivedFrom(instance, className)	
-	local class = classes[instance.__name]
+    local class = classes[instance.__name]
     if(not class) then
         error('Class ' .. className .. ' not found', 2)
     end
