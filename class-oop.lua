@@ -15,6 +15,7 @@ local function table_copy(t, st)
     end
     if (st) then
         newTbl.super = st
+        newTbl.baseClassName = st.__name -- make sure to copy all properties added in createClass()
         setmetatable(newTbl, { __index = newTbl.super })
     end
     return newTbl
